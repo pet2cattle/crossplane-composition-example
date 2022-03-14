@@ -1,0 +1,7 @@
+apiVersion: pet2cattle.com/v1alpha1
+kind: SGAllowOutgoing
+metadata:
+  name: sgone
+spec:
+  parameters:
+    region: us-west-2

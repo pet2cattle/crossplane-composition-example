@@ -1,0 +1,30 @@
+# resource "aws_security_group_rule" "egress_any_sg_pod" {
+#   description              = "allow all outbound traffic"
+#   security_group_id        = aws_security_group.pod_sg.id
+#   type                     = "egress"
+
+#   from_port                = 0
+#   to_port                  = 0
+#   protocol                 = "-1"
+
+#   cidr_blocks              = ["0.0.0.0/0"]
+# }
+
+apiVersion: ec2.aws.jet.crossplane.io/v1alpha2
+kind: SecurityGroupRule
+metadata:
+  name: 'xplanesg-egress'
+spec:
+  forProvider:
+    securityGroupIdSelector:
+      matchLabels:
+        sgname: 'xplanesg'
+    fromPort: 0
+    toPort: 0
+    protocol: "-1"
+    type: 'egress'
+    region: 'us-west-2'
+    cidrBlocks:
+      - '0.0.0.0/0'
+  providerConfigRef:
+    name: 'aws-jetprovider-config'

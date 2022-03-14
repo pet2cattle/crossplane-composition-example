@@ -1,0 +1,56 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: sgsallowoutgoing
+  labels:
+    crossplane.io/xrd: sgsallowoutgoing.pet2cattle.com
+spec:
+  writeConnectionSecretsToNamespace: crossplane-system
+  compositeTypeRef:
+    apiVersion: pet2cattle.com/v1alpha1
+    kind: SGAllowOutgoing
+  resources:
+  - name: sg
+    base:
+      apiVersion: ec2.aws.jet.crossplane.io/v1alpha2
+      kind: SecurityGroup
+      spec:
+        forProvider:
+          description: 'xplane SG test'
+          vpcId: 'vpc-1234abcd'
+        providerConfigRef:
+          name: 'aws-jetprovider-config'
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.name
+      toFieldPath: spec.forProvider.name
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.name
+      toFieldPath: metadata.annotations.crossplane.io/external-name
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.name
+      toFieldPath: metadata.labels.sgname
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.region
+      toFieldPath: spec.forProvider.region
+  - name: sg-egress
+    base:
+      apiVersion: ec2.aws.jet.crossplane.io/v1alpha2
+      kind: SecurityGroupRule
+      spec:
+        forProvider:
+          fromPort: 0
+          toPort: 0
+          protocol: "-1"
+          type: 'egress'
+          cidrBlocks:
+            - '0.0.0.0/0'
+        providerConfigRef:
+          name: 'aws-jetprovider-config'
+    patches:
+    - type: FromCompositeFieldPath
+      fromFieldPath: spec.parameters.region
+      toFieldPath: spec.forProvider.region
+    - type: FromCompositeFieldPath
+      fromFieldPath: metadata.name
+      toFieldPath: spec.forProvider.securityGroupIdSelector.matchLabels.sgname
