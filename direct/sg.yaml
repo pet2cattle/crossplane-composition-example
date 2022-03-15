@@ -1,3 +1,10 @@
+
+# resource "aws_security_group" "pod_sg" {
+#   name        = "xplane-xplanesg"
+#   description = "xplane SG test"
+#   vpc_id      = var.vpc_id
+# }
+
 apiVersion: ec2.aws.jet.crossplane.io/v1alpha2
 kind: SecurityGroup
 metadata:
